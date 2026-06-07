@@ -4,6 +4,8 @@ import { createTray, updateTrayMenu } from './tray';
 import { setupRecorderIPC, setOverlayWindow, setRecordingState, getCurrentState } from './recorder';
 import { getSettings, saveSettings } from './store';
 import { openSettingsServer, stopSettingsServer } from './settings-server';
+import { checkMacAccessibility } from './injector';
+import { applyStartOnLogin } from './login-item';
 import { IPC } from '../shared/types';
 
 let overlayWindow: BrowserWindow | null = null;
@@ -74,6 +76,12 @@ async function main() {
   ipcMain.handle(IPC.GET_SETTINGS, () => getSettings());
   ipcMain.on(IPC.SAVE_SETTINGS, (_event, settings) => saveSettings(settings));
   ipcMain.on(IPC.OPEN_SETTINGS, () => openSettingsServer());
+
+  // 同步開機自動啟動設定
+  applyStartOnLogin(getSettings().startOnLogin);
+
+  // Mac：延遲 500ms 再檢查 Accessibility 權限（等系統匣出現後再跳對話框）
+  setTimeout(() => checkMacAccessibility(), 500);
 
   // 熱鍵：單按切換錄音
   registerHotkey();

@@ -1,10 +1,11 @@
 # 🎤 Jacky Never Type
 
-> AI-powered voice dictation tool for Windows — speak, and your words appear wherever your cursor is.
+> AI-powered voice dictation tool for Windows and macOS — speak, and your words appear wherever your cursor is.
 
 ![Electron](https://img.shields.io/badge/Electron-42-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![React](https://img.shields.io/badge/React-19-61dafb)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey)
 ![License](https://img.shields.io/badge/license-ISC-green)
 
 ---
@@ -17,20 +18,49 @@
   - Light / Standard / Strong modes (Strong mode mimics Typeless-style intelligent cleanup)
   - Detects self-corrections and keeps only the intended version
 - **Output language** — keep original language, or always translate to a target language (EN / 繁中 / 日本語 / 한국어)
+- **Interface language** — switch between 繁體中文 and English in Settings
 - **Auto-paste** — refined text is automatically pasted into any focused input field
 - **History** — last 20 results shown in settings; all entries saved permanently as JSON
-- **Lives in the system tray** — no taskbar clutter; floating overlay shows recording status
+- **Lives in the system tray / menu bar** — no taskbar clutter; floating overlay shows recording status
 - **Settings window** — clean UI, no browser required
 
 ---
 
 ## 📦 Download
 
-Pre-built portable app (Windows x64):
+Pre-built portable app:
 
 👉 **[Download from Releases](../../releases)**
 
-Extract the zip and double-click `Jacky Never Type.exe`. No installation required.
+- **Windows x64** — extract the zip, double-click `Jacky Never Type.exe`. No installation required.
+- **macOS** — open the `.dmg`, drag to Applications.
+
+---
+
+## 🚀 Quick Start (Free — Groq)
+
+Groq provides a **free API** with fast Whisper inference and generous rate limits.
+
+### Step 1 — Create a Groq account
+Go to **[console.groq.com](https://console.groq.com)** and sign up with Google, GitHub, or email.
+
+### Step 2 — Generate an API key
+1. In the Groq Console, click **API Keys** in the left sidebar
+2. Click **Create API Key**, give it a name (e.g. `Jacky Never Type`)
+3. Copy the key — it starts with `gsk_`
+   > ⚠️ Groq only shows the key once. Save it somewhere safe.
+
+### Step 3 — Enter the key in settings
+1. Launch Jacky Never Type (the icon appears in the system tray / menu bar)
+2. Click the tray icon → ⚙️ **Settings**
+3. Go to **API Keys** tab → paste into **Groq API Key**
+4. Settings save automatically
+
+### Step 4 — Verify it works
+1. **Speech-to-Text** tab → select **Groq Whisper**
+2. **AI Refinement** tab → enable → select **Groq LLaMA**
+3. Press `F9`, speak a sentence, press `F9` again
+4. Your refined text appears in the focused app within ~1 second ✅
 
 ---
 
@@ -39,12 +69,12 @@ Extract the zip and double-click `Jacky Never Type.exe`. No installation require
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) 18+
-- Windows 10/11 (text injection uses PowerShell)
+- Windows 10/11 or macOS 12+
 
 ### Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/jacky-never-type.git
+git clone https://github.com/JackySuperior/jacky-never-type.git
 cd jacky-never-type
 npm install
 ```
@@ -61,31 +91,24 @@ npm run dev
 npm run package
 ```
 
-Output will be in `release/win-unpacked/`.
+- **Windows output:** `release/win-unpacked/`
+- **macOS output:** `release/` (DMG + ZIP) — must be run on a Mac
 
 ---
 
 ## ⚙️ Configuration
 
-On first launch, click the **system tray icon → Settings**.
+On first launch, click the **system tray / menu bar icon → Settings**.
 
 ### API Keys (at least one required)
 
 | Provider | Used for | Get key |
 |----------|----------|---------|
-| **Groq** | STT + AI (recommended) | [console.groq.com](https://console.groq.com) — free |
+| **Groq** | STT + AI (recommended, free) | [console.groq.com](https://console.groq.com) |
 | OpenAI | STT (Whisper) + AI (GPT-4o Mini) | [platform.openai.com](https://platform.openai.com) |
-| Google Gemini | STT + AI | [aistudio.google.com](https://aistudio.google.com/apikey) — free |
+| Google Gemini | STT + AI (free) | [aistudio.google.com](https://aistudio.google.com/apikey) |
 
 > All keys are stored **locally only** and never uploaded anywhere.
-
-### Recommended setup (free)
-
-1. Sign up at [console.groq.com](https://console.groq.com)
-2. Create a free API key
-3. Paste it into Settings → API Keys → Groq API Key
-4. Settings → Speech-to-Text → select **Groq Whisper**
-5. Settings → AI Refinement → select **Groq** as provider
 
 ---
 
@@ -95,19 +118,36 @@ On first launch, click the **system tray icon → Settings**.
 |--------|-----|
 | Start recording | Press `F9` |
 | Stop & transcribe | Press `F9` again |
-| Open settings | System tray icon → left-click → ⚙️ Settings |
+| Open settings | Tray icon → ⚙️ Settings |
+| Switch UI language | Settings → top-right corner → **繁中** / **EN** |
 | View history | Settings → 📜 History |
 | Change hotkey | Settings → ⌨️ Hotkey |
 
-> **Note:** `Ctrl+Shift+Space` and `Alt+Shift` are reserved by Windows IME on most systems. `F9` works reliably.
+---
+
+## 🍎 macOS Notes
+
+### First launch — Accessibility permission
+On first run, macOS will show a dialog asking for **Accessibility** permission.
+This is required so the app can simulate Cmd+V to paste text into other apps.
+
+1. Click **Open System Settings** in the dialog
+2. Go to **Privacy & Security → Accessibility**
+3. Toggle **Jacky Never Type** to ON
+
+### Default hotkey on Mac
+`F9` works on Mac. Alternatively use `CommandOrControl+Shift+Space` (if not taken by Spotlight) — change it in Settings → Hotkey.
+
+### Known macOS limitation
+Text injection uses AppleScript (`System Events keystroke`). Some heavily sandboxed App Store apps may not accept simulated keystrokes.
 
 ---
 
 ## 🔧 Known Issues
 
-- **Hotkey conflicts** — If `F9` conflicts with another app, change it in Settings → Hotkey (type the key string manually, e.g. `F8` or `CommandOrControl+Shift+F9`)
+- **Hotkey conflicts** — If `F9` conflicts with another app, change it in Settings → Hotkey (e.g. `F8` or `CommandOrControl+Shift+F9`)
 - **Simplified Chinese output** — Groq Whisper occasionally outputs simplified Chinese; the AI refinement step corrects it to Traditional Chinese automatically
-- **Text injection** — Uses `Ctrl+V` simulation via PowerShell; works in most apps but may not work in UAC-elevated windows
+- **Text injection (Windows)** — Uses `Ctrl+V` via PowerShell; may not work in UAC-elevated windows
 
 ---
 

@@ -1,4 +1,4 @@
-import { clipboard } from 'electron';
+import { clipboard, systemPreferences, dialog, shell } from 'electron';
 import { execSync } from 'child_process';
 
 export async function injectText(text: string): Promise<void> {
@@ -42,4 +42,29 @@ function simulatePasteMac(): void {
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * 檢查 macOS Accessibility 權限（貼字功能需要）
+ * 在 App 啟動後呼叫，若未授權則顯示引導對話框
+ */
+export function checkMacAccessibility(): void {
+  if (process.platform !== 'darwin') return;
+
+  // false = 只檢查，不主動觸發系統詢問
+  const trusted = systemPreferences.isTrustedAccessibilityClient(false);
+  if (!trusted) {
+    dialog.showMessageBox({
+      type: 'warning',
+      title: 'Accessibility Permission Required',
+      message: 'Jacky Never Type needs Accessibility access to paste text into other apps.',
+      detail: 'Open System Settings → Privacy & Security → Accessibility, then enable "Jacky Never Type".',
+      buttons: ['Open System Settings', 'Later'],
+      defaultId: 0,
+    }).then(({ response }) => {
+      if (response === 0) {
+        shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility');
+      }
+    });
+  }
 }

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { BrowserWindow } from 'electron';
 import { getSettings, saveSettings, getHistory, clearHistory } from './store';
+import { applyStartOnLogin } from './login-item';
 import { HISTORY_DISPLAY_LIMIT } from '../shared/types';
 
 let server: http.Server | null = null;
@@ -76,6 +77,8 @@ export function openSettingsServer(): void {
         try {
           const newSettings = JSON.parse(body);
           saveSettings(newSettings);
+          // 同步開機自動啟動設定
+          applyStartOnLogin(newSettings.startOnLogin ?? false);
           res.writeHead(200, corsHeaders('application/json'));
           res.end(JSON.stringify({ ok: true }));
         } catch {

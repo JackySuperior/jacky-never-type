@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AppSettings, DEFAULT_SETTINGS, STTProvider, AIProvider, HistoryEntry, OUTPUT_LANGUAGES } from '../../../shared/types';
+import { t } from './i18n';
 
 type Tab = 'api' | 'stt' | 'ai' | 'output' | 'hotkey' | 'history' | 'about';
 
@@ -37,7 +38,6 @@ export default function App() {
       setCopiedId(entry.id);
       setTimeout(() => setCopiedId(null), 1500);
     } catch {
-      // 後備方案：用隱藏 textarea 複製
       const ta = document.createElement('textarea');
       ta.value = entry.text;
       document.body.appendChild(ta);
@@ -50,7 +50,7 @@ export default function App() {
   }
 
   async function clearAllHistory() {
-    if (!confirm('確定要清空所有歷史記錄嗎？此動作無法復原。')) return;
+    if (!confirm(t('history_clear_confirm', lang))) return;
     await fetch('/api/history/clear', { method: 'POST' });
     setHistory([]);
   }
@@ -83,13 +83,28 @@ export default function App() {
     await persist(settings);
   }
 
-  if (loading) return <div className="loading">載入中...</div>;
+  // 從設定讀取介面語言，每次 render 自動更新
+  const lang = settings.uiLanguage;
+
+  if (loading) return <div className="loading">載入中... / Loading...</div>;
 
   return (
     <div className="app">
       <header className="header">
-        <div className="logo">🎙 Jacky Never Type</div>
-        <p className="subtitle">AI 語音輸入工具設定</p>
+        <div className="header-top">
+          <div className="logo">🎙 Jacky Never Type</div>
+          <div className="lang-switcher">
+            <button
+              className={`lang-btn${lang === 'zh-Hant' ? ' active' : ''}`}
+              onClick={() => update('uiLanguage', 'zh-Hant')}
+            >繁中</button>
+            <button
+              className={`lang-btn${lang === 'en' ? ' active' : ''}`}
+              onClick={() => update('uiLanguage', 'en')}
+            >EN</button>
+          </div>
+        </div>
+        <p className="subtitle">{t('subtitle', lang)}</p>
       </header>
 
       <div className="layout">
@@ -100,7 +115,7 @@ export default function App() {
               className={`nav-item ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tabIcon(tab)} {tabLabel(tab)}
+              {tabIcon(tab)} {t(`tab_${tab}` as Parameters<typeof t>[0], lang)}
             </button>
           ))}
         </nav>
@@ -108,8 +123,8 @@ export default function App() {
         <main className="content">
           {activeTab === 'api' && (
             <section>
-              <h2>API 金鑰</h2>
-              <p className="desc">所有金鑰僅存在您的本機，不會上傳。</p>
+              <h2>{t('api_title', lang)}</h2>
+              <p className="desc">{t('api_desc', lang)}</p>
 
               <div className="form-group">
                 <label>OpenAI API Key</label>
@@ -119,7 +134,7 @@ export default function App() {
                   onChange={e => update('openaiApiKey', e.target.value)}
                   placeholder="sk-..."
                 />
-                <span className="hint">用於 Whisper STT 及 GPT 文字修飾</span>
+                <span className="hint">{t('openai_hint', lang)}</span>
               </div>
 
               <div className="form-group">
@@ -130,7 +145,7 @@ export default function App() {
                   onChange={e => update('groqApiKey', e.target.value)}
                   placeholder="gsk_..."
                 />
-                <span className="hint">用於 Groq Whisper STT（速度最快）及 LLaMA 文字修飾</span>
+                <span className="hint">{t('groq_hint', lang)}</span>
               </div>
 
               <div className="form-group">
@@ -141,17 +156,17 @@ export default function App() {
                   onChange={e => update('geminiApiKey', e.target.value)}
                   placeholder="AIza..."
                 />
-                <span className="hint">用於 Gemini 文字修飾</span>
+                <span className="hint">{t('gemini_hint', lang)}</span>
               </div>
             </section>
           )}
 
           {activeTab === 'stt' && (
             <section>
-              <h2>語音辨識設定</h2>
+              <h2>{t('stt_title', lang)}</h2>
 
               <div className="form-group">
-                <label>STT 供應商</label>
+                <label>{t('stt_provider', lang)}</label>
                 <div className="radio-group">
                   {(['groq', 'gemini', 'openai'] as STTProvider[]).map(p => (
                     <label key={p} className="radio-label">
@@ -162,23 +177,23 @@ export default function App() {
                         checked={settings.sttProvider === p}
                         onChange={() => update('sttProvider', p)}
                       />
-                      <span>{sttProviderLabel(p)}</span>
+                      <span>{t(`stt_${p}` as Parameters<typeof t>[0], lang)}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div className="form-group">
-                <label>語言偏好</label>
+                <label>{t('stt_lang', lang)}</label>
                 <select
                   value={settings.language}
                   onChange={e => update('language', e.target.value)}
                 >
-                  <option value="auto">🌐 自動偵測</option>
-                  <option value="zh">🇹🇼 中文（繁體）</option>
-                  <option value="en">🇺🇸 English</option>
-                  <option value="ja">🇯🇵 日本語</option>
-                  <option value="ko">🇰🇷 한국어</option>
+                  <option value="auto">{t('lang_auto', lang)}</option>
+                  <option value="zh">{t('lang_zh', lang)}</option>
+                  <option value="en">{t('lang_en', lang)}</option>
+                  <option value="ja">{t('lang_ja', lang)}</option>
+                  <option value="ko">{t('lang_ko', lang)}</option>
                 </select>
               </div>
             </section>
@@ -186,7 +201,7 @@ export default function App() {
 
           {activeTab === 'ai' && (
             <section>
-              <h2>AI 文字修飾</h2>
+              <h2>{t('ai_title', lang)}</h2>
 
               <div className="form-group">
                 <label className="toggle-label">
@@ -195,15 +210,15 @@ export default function App() {
                     checked={settings.aiEnabled}
                     onChange={e => update('aiEnabled', e.target.checked)}
                   />
-                  <span>啟用 AI 修飾</span>
+                  <span>{t('ai_enable', lang)}</span>
                 </label>
-                <span className="hint">自動移除語助詞、修正標點、讓文字更通順</span>
+                <span className="hint">{t('ai_enable_hint', lang)}</span>
               </div>
 
               {settings.aiEnabled && (
                 <>
                   <div className="form-group">
-                    <label>AI 供應商</label>
+                    <label>{t('ai_provider', lang)}</label>
                     <div className="radio-group">
                       {(['gemini', 'openai', 'groq'] as AIProvider[]).map(p => (
                         <label key={p} className="radio-label">
@@ -214,32 +229,32 @@ export default function App() {
                             checked={settings.aiProvider === p}
                             onChange={() => update('aiProvider', p)}
                           />
-                          <span>{aiProviderLabel(p)}</span>
+                          <span>{t(`ai_${p}` as Parameters<typeof t>[0], lang)}</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label>修飾強度</label>
+                    <label>{t('ai_strength', lang)}</label>
                     <div className="radio-group">
                       <label className="radio-label">
                         <input type="radio" name="aiStrength" value="light"
                           checked={settings.aiStrength === 'light'}
                           onChange={() => update('aiStrength', 'light')} />
-                        <span>🪶 輕度 — 只移除語助詞</span>
+                        <span>{t('ai_light', lang)}</span>
                       </label>
                       <label className="radio-label">
                         <input type="radio" name="aiStrength" value="standard"
                           checked={settings.aiStrength === 'standard'}
                           onChange={() => update('aiStrength', 'standard')} />
-                        <span>⚡ 標準 — 修正標點與語句（推薦）</span>
+                        <span>{t('ai_standard', lang)}</span>
                       </label>
                       <label className="radio-label">
                         <input type="radio" name="aiStrength" value="strong"
                           checked={settings.aiStrength === 'strong'}
                           onChange={() => update('aiStrength', 'strong')} />
-                        <span>✨ 強力 — 完整書面化改寫</span>
+                        <span>{t('ai_strong', lang)}</span>
                       </label>
                     </div>
                   </div>
@@ -250,11 +265,11 @@ export default function App() {
 
           {activeTab === 'output' && (
             <section>
-              <h2>輸出語言</h2>
-              <p className="desc">決定語音最終要輸出成什麼語言。翻譯功能需開啟「AI 修飾」才會生效。</p>
+              <h2>{t('output_title', lang)}</h2>
+              <p className="desc">{t('output_desc', lang)}</p>
 
               <div className="form-group">
-                <label>輸出模式</label>
+                <label>{t('output_mode', lang)}</label>
                 <div className="radio-group">
                   <label className={`lang-card ${settings.outputMode === 'original' ? 'active' : ''}`}>
                     <input
@@ -264,8 +279,8 @@ export default function App() {
                       onChange={() => update('outputMode', 'original')}
                     />
                     <div className="lang-card-body">
-                      <div className="lang-card-title">🗣 維持說話的原文</div>
-                      <div className="lang-card-desc">自動判斷你說的語言並維持原樣。說中文出中文、說英文出英文。</div>
+                      <div className="lang-card-title">{t('output_original_title', lang)}</div>
+                      <div className="lang-card-desc">{t('output_original_desc', lang)}</div>
                     </div>
                   </label>
 
@@ -277,8 +292,8 @@ export default function App() {
                       onChange={() => update('outputMode', 'fixed')}
                     />
                     <div className="lang-card-body">
-                      <div className="lang-card-title">🌐 永遠輸出指定語言</div>
-                      <div className="lang-card-desc">不管你說什麼語言，最後都翻譯成你選的語言。</div>
+                      <div className="lang-card-title">{t('output_fixed_title', lang)}</div>
+                      <div className="lang-card-desc">{t('output_fixed_desc', lang)}</div>
                     </div>
                   </label>
                 </div>
@@ -286,7 +301,7 @@ export default function App() {
 
               {settings.outputMode === 'fixed' && (
                 <div className="form-group">
-                  <label>目標語言</label>
+                  <label>{t('output_target', lang)}</label>
                   <select
                     value={settings.outputLanguage}
                     onChange={e => update('outputLanguage', e.target.value)}
@@ -297,7 +312,7 @@ export default function App() {
                   </select>
                   {!settings.aiEnabled && (
                     <span className="hint" style={{ color: '#ff9f43' }}>
-                      ⚠️ 翻譯需要 AI，請先到「AI 修飾」分頁啟用。
+                      {t('output_ai_warn', lang)}
                     </span>
                   )}
                 </div>
@@ -307,24 +322,23 @@ export default function App() {
 
           {activeTab === 'hotkey' && (
             <section>
-              <h2>快捷鍵設定</h2>
+              <h2>{t('hotkey_title', lang)}</h2>
 
               <div className="form-group">
-                <label>錄音熱鍵（單按開始/停止）</label>
+                <label>{t('hotkey_label', lang)}</label>
                 <input
                   type="text"
                   value={settings.hotkey}
                   onChange={e => update('hotkey', e.target.value)}
                   placeholder="CommandOrControl+Shift+Space"
                 />
-                <span className="hint">
-                  格式：CommandOrControl / Alt / Shift + 按鍵<br />
-                  例如：CommandOrControl+Shift+Space
+                <span className="hint" style={{ whiteSpace: 'pre-line' }}>
+                  {t('hotkey_hint', lang)}
                 </span>
               </div>
 
               <div className="form-group">
-                <label>設定頁面連接埠</label>
+                <label>{t('port_label', lang)}</label>
                 <input
                   type="number"
                   value={settings.settingsPort}
@@ -339,15 +353,19 @@ export default function App() {
           {activeTab === 'history' && (
             <section>
               <div className="history-header">
-                <h2>歷史記錄</h2>
+                <h2>{t('history_title', lang)}</h2>
                 {history.length > 0 && (
-                  <button className="btn-clear" onClick={clearAllHistory}>🗑 清空</button>
+                  <button className="btn-clear" onClick={clearAllHistory}>
+                    {t('history_clear', lang)}
+                  </button>
                 )}
               </div>
-              <p className="desc">顯示最近 {history.length} 筆辨識結果，點「複製」即可取用。</p>
+              <p className="desc">
+                {t('history_desc', lang).replace('{n}', String(history.length))}
+              </p>
 
               {history.length === 0 ? (
-                <div className="history-empty">尚無歷史記錄，開始用語音輸入後會出現在這裡。</div>
+                <div className="history-empty">{t('history_empty', lang)}</div>
               ) : (
                 <div className="history-list">
                   {history.map(entry => (
@@ -359,7 +377,7 @@ export default function App() {
                           className={`btn-copy ${copiedId === entry.id ? 'copied' : ''}`}
                           onClick={() => copyEntry(entry)}
                         >
-                          {copiedId === entry.id ? '✅ 已複製' : '📋 複製'}
+                          {copiedId === entry.id ? t('history_copied', lang) : t('history_copy', lang)}
                         </button>
                       </div>
                     </div>
@@ -371,18 +389,18 @@ export default function App() {
 
           {activeTab === 'about' && (
             <section>
-              <h2>關於 Jacky Never Type</h2>
+              <h2>{t('about_title', lang)}</h2>
               <div className="about-card">
-                <p>🎙 <strong>Jacky Never Type</strong> — AI 語音輸入工具</p>
-                <p>版本 1.0.0</p>
+                <p>🎙 <strong>Jacky Never Type</strong> — {t('about_desc', lang)}</p>
+                <p>{t('about_version', lang)}</p>
                 <br />
-                <p>支援的 STT 供應商：</p>
+                <p>{t('about_stt', lang)}</p>
                 <ul>
-                  <li>Groq Whisper Large V3 Turbo（速度最快）</li>
-                  <li>OpenAI Whisper-1</li>
+                  <li>{t('about_groq_stt', lang)}</li>
+                  <li>{t('about_openai_stt', lang)}</li>
                 </ul>
                 <br />
-                <p>支援的 AI 修飾供應商：</p>
+                <p>{t('about_ai', lang)}</p>
                 <ul>
                   <li>Google Gemini 2.0 Flash</li>
                   <li>OpenAI GPT-4o Mini</li>
@@ -396,7 +414,7 @@ export default function App() {
 
       <footer className="footer">
         <button className="btn-save" onClick={handleSave}>
-          {saved ? '✅ 已儲存！' : '儲存設定'}
+          {saved ? t('saved_btn', lang) : t('save_btn', lang)}
         </button>
       </footer>
     </div>
@@ -405,24 +423,4 @@ export default function App() {
 
 function tabIcon(tab: Tab): string {
   return { api: '🔑', stt: '🎙', ai: '✨', output: '🌐', hotkey: '⌨️', history: '📜', about: 'ℹ️' }[tab];
-}
-
-function tabLabel(tab: Tab): string {
-  return { api: 'API 金鑰', stt: '語音辨識', ai: 'AI 修飾', output: '輸出語言', hotkey: '快捷鍵', history: '歷史', about: '關於' }[tab];
-}
-
-function sttProviderLabel(p: STTProvider): string {
-  return {
-    groq: '⚡ Groq Whisper（推薦，速度最快）',
-    gemini: '💎 Google Gemini 2.0 Flash',
-    openai: '🤖 OpenAI Whisper-1',
-  }[p];
-}
-
-function aiProviderLabel(p: AIProvider): string {
-  return {
-    gemini: '💎 Google Gemini 2.0 Flash（推薦）',
-    openai: '🤖 OpenAI GPT-4o Mini',
-    groq: '⚡ Groq LLaMA 3.3 70B',
-  }[p];
 }
