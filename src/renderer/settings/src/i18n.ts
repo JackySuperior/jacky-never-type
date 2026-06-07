@@ -77,7 +77,9 @@ export const translations = {
   // 快捷鍵分頁
   hotkey_title:   { 'zh-Hant': '快捷鍵設定', en: 'Hotkey Settings' },
   hotkey_label:   { 'zh-Hant': '錄音熱鍵（單按開始/停止）', en: 'Recording hotkey (press once to start/stop)' },
-  hotkey_hint:    { 'zh-Hant': '格式：CommandOrControl / Alt / Shift + 按鍵\n例如：CommandOrControl+Shift+Space', en: 'Format: CommandOrControl / Alt / Shift + Key\nExample: CommandOrControl+Shift+Space' },
+  hotkey_record:  { 'zh-Hant': '🎯 點此錄製', en: '🎯 Click to record' },
+  hotkey_press:   { 'zh-Hant': '請按下按鍵組合…（Esc 取消）', en: 'Press your keys…  (Esc to cancel)' },
+  hotkey_hint:    { 'zh-Hant': '點「錄製」後直接按下想要的組合鍵。\nMac 上純功能鍵（如 F9）常被系統佔用，建議用 Command + Shift + 字母。', en: 'Click Record, then press the keys you want.\nOn Mac, plain function keys (e.g. F9) are often reserved by the system — prefer Command + Shift + a letter.' },
   showlast_label: { 'zh-Hant': '叫出上一句熱鍵（顯示複製卡片）', en: 'Show last result hotkey (copy card)' },
   showlast_hint:  { 'zh-Hant': '若剛剛說的話沒貼進想要的地方，按這個鍵可叫出上一句的文字並一鍵複製。', en: 'If the last dictation did not land where you wanted, press this to bring up the text and copy it.' },
   port_label:     { 'zh-Hant': '設定頁面連接埠', en: 'Settings server port' },
@@ -94,7 +96,7 @@ export const translations = {
   // 關於分頁
   about_title:   { 'zh-Hant': '關於 Jacky Never Type', en: 'About Jacky Never Type' },
   about_desc:    { 'zh-Hant': 'AI 語音輸入工具', en: 'AI Voice Dictation Tool' },
-  about_version: { 'zh-Hant': '版本 1.1.0', en: 'Version 1.1.0' },
+  about_version: { 'zh-Hant': '版本 1.2.0', en: 'Version 1.2.0' },
   about_stt:     { 'zh-Hant': '支援的 STT 供應商：', en: 'Supported STT providers:' },
   about_ai:      { 'zh-Hant': '支援的 AI 修飾供應商：', en: 'Supported AI refinement providers:' },
   about_groq_stt:{ 'zh-Hant': 'Groq Whisper Large V3 Turbo（速度最快）', en: 'Groq Whisper Large V3 Turbo (fastest)' },

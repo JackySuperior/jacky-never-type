@@ -1,6 +1,6 @@
 {
   "name": "jacky-never-type",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AI 語音輸入工具",
   "main": "dist/main/index.js",
   "scripts": {

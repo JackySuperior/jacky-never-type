@@ -3,7 +3,7 @@ import * as path from 'path';
 import { createTray, updateTrayMenu } from './tray';
 import { setupRecorderIPC, setOverlayWindow, setRecordingState, getCurrentState, showLastResult } from './recorder';
 import { getSettings, saveSettings } from './store';
-import { openSettingsServer, stopSettingsServer } from './settings-server';
+import { openSettingsServer, stopSettingsServer, setOnSettingsSaved } from './settings-server';
 import { checkMacAccessibility } from './injector';
 import { applyStartOnLogin } from './login-item';
 import { IPC } from '../shared/types';
@@ -85,6 +85,9 @@ async function main() {
 
   // 熱鍵：單按切換錄音
   registerHotkey();
+
+  // 設定儲存後，重新註冊熱鍵（改熱鍵即時生效，不用重開）
+  setOnSettingsSaved(() => registerHotkey());
 
   // 監聽 overlay 的切換請求
   ipcMain.on(IPC.TOGGLE_RECORDING, () => handleToggleRecording());

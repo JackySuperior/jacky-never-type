@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppSettings, DEFAULT_SETTINGS, STTProvider, AIProvider, HistoryEntry, OUTPUT_LANGUAGES } from '../../../shared/types';
+import { AppSettings, DEFAULT_SETTINGS, STTProvider, AIProvider, HistoryEntry, OUTPUT_LANGUAGES, UILanguage } from '../../../shared/types';
 import { t } from './i18n';
 
 type Tab = 'api' | 'stt' | 'ai' | 'output' | 'vocab' | 'hotkey' | 'history' | 'about';
@@ -375,11 +375,10 @@ export default function App() {
 
               <div className="form-group">
                 <label>{t('hotkey_label', lang)}</label>
-                <input
-                  type="text"
+                <HotkeyRecorder
                   value={settings.hotkey}
-                  onChange={e => update('hotkey', e.target.value)}
-                  placeholder="CommandOrControl+Shift+Space"
+                  onChange={v => update('hotkey', v)}
+                  lang={lang}
                 />
                 <span className="hint" style={{ whiteSpace: 'pre-line' }}>
                   {t('hotkey_hint', lang)}
@@ -388,11 +387,10 @@ export default function App() {
 
               <div className="form-group">
                 <label>{t('showlast_label', lang)}</label>
-                <input
-                  type="text"
+                <HotkeyRecorder
                   value={settings.showLastHotkey}
-                  onChange={e => update('showLastHotkey', e.target.value)}
-                  placeholder="F10"
+                  onChange={v => update('showLastHotkey', v)}
+                  lang={lang}
                 />
                 <span className="hint">{t('showlast_hint', lang)}</span>
               </div>
@@ -477,6 +475,74 @@ export default function App() {
           {saved ? t('saved_btn', lang) : t('save_btn', lang)}
         </button>
       </footer>
+    </div>
+  );
+}
+
+// 把鍵盤事件轉成 Electron accelerator 字串（例如 "Command+Shift+D"）
+function eventToAccelerator(e: KeyboardEvent): string | null {
+  const code = e.code;
+  let key = '';
+  if (/^Key[A-Z]$/.test(code)) key = code.slice(3);
+  else if (/^Digit[0-9]$/.test(code)) key = code.slice(5);
+  else if (/^F([1-9]|1[0-9]|2[0-4])$/.test(code)) key = code;
+  else if (code === 'Space') key = 'Space';
+  else if (code === 'Enter') key = 'Return';
+  else if (code === 'Tab') key = 'Tab';
+  else if (code === 'Backquote') key = '`';
+  else if (code === 'Minus') key = '-';
+  else if (code === 'Equal') key = '=';
+  else if (code === 'BracketLeft') key = '[';
+  else if (code === 'BracketRight') key = ']';
+  else if (code === 'Semicolon') key = ';';
+  else if (code === 'Quote') key = "'";
+  else if (code === 'Comma') key = ',';
+  else if (code === 'Period') key = '.';
+  else if (code === 'Slash') key = '/';
+  else if (code === 'Backslash') key = '\\';
+  else if (code === 'ArrowUp') key = 'Up';
+  else if (code === 'ArrowDown') key = 'Down';
+  else if (code === 'ArrowLeft') key = 'Left';
+  else if (code === 'ArrowRight') key = 'Right';
+  else return null; // 只有修飾鍵或不支援的鍵
+
+  const mods: string[] = [];
+  if (e.ctrlKey) mods.push('Control');
+  if (e.metaKey) mods.push('Command');
+  if (e.altKey) mods.push('Alt');
+  if (e.shiftKey) mods.push('Shift');
+  return [...mods, key].join('+');
+}
+
+function HotkeyRecorder({ value, onChange, lang }: { value: string; onChange: (v: string) => void; lang: UILanguage }) {
+  const [recording, setRecording] = useState(false);
+
+  useEffect(() => {
+    if (!recording) return;
+    function onKey(e: KeyboardEvent) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.key === 'Escape') { setRecording(false); return; }
+      const acc = eventToAccelerator(e);
+      if (acc) {
+        onChange(acc);
+        setRecording(false);
+      }
+    }
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [recording]);
+
+  return (
+    <div className="hotkey-recorder">
+      <code className="hotkey-value">{value || '—'}</code>
+      <button
+        type="button"
+        className={`hotkey-rec-btn${recording ? ' recording' : ''}`}
+        onClick={() => setRecording(r => !r)}
+      >
+        {recording ? t('hotkey_press', lang) : t('hotkey_record', lang)}
+      </button>
     </div>
   );
 }

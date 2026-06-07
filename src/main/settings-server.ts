@@ -9,6 +9,12 @@ import { HISTORY_DISPLAY_LIMIT } from '../shared/types';
 let server: http.Server | null = null;
 let settingsWindow: BrowserWindow | null = null;
 
+// 設定儲存後的回呼（讓主程序重新註冊熱鍵）
+let onSettingsSaved: (() => void) | null = null;
+export function setOnSettingsSaved(cb: () => void): void {
+  onSettingsSaved = cb;
+}
+
 function openSettingsWindow(port: number): void {
   if (settingsWindow && !settingsWindow.isDestroyed()) {
     settingsWindow.focus();
@@ -79,6 +85,8 @@ export function openSettingsServer(): void {
           saveSettings(newSettings);
           // 同步開機自動啟動設定
           applyStartOnLogin(newSettings.startOnLogin ?? false);
+          // 通知主程序重新註冊熱鍵（讓改熱鍵即時生效）
+          onSettingsSaved?.();
           res.writeHead(200, corsHeaders('application/json'));
           res.end(JSON.stringify({ ok: true }));
         } catch {
