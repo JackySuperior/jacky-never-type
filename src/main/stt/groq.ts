@@ -15,8 +15,9 @@ export async function transcribeWithGroq(
   fs.writeFileSync(tmpPath, audioBuffer);
 
   try {
-    // 用繁體中文範例文字當提示，讓 Whisper 偏向輸出繁體（zh 或 auto 時）
-    const zhHint = (language === 'zh' || language === 'auto')
+    // 只有「明確指定中文」時才給繁體提示。
+    // 絕對不能在 auto（自動偵測）時加中文提示，否則會把英文等其他語言硬聽成中文！
+    const zhHint = language === 'zh'
       ? '以下是一段繁體中文的語音內容，請使用台灣常用的繁體中文字。'
       : '';
     // 把自訂詞彙塞進 prompt，提高人名／術語辨識正確率
