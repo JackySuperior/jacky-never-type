@@ -94,6 +94,10 @@ npm run package
 - **Windows output:** `release/win-unpacked/`
 - **macOS output:** `release/` (DMG + ZIP) — must be run on a Mac
 
+> 💡 **Automated builds:** Pushing a `v*` git tag (e.g. `v1.1`) triggers a GitHub Actions
+> workflow that builds **both Windows and macOS** in the cloud and attaches the installers
+> to the matching GitHub Release. No Mac required to produce the macOS DMG.
+
 ---
 
 ## ⚙️ Configuration
@@ -126,6 +130,17 @@ On first launch, click the **system tray / menu bar icon → Settings**.
 ---
 
 ## 🍎 macOS Notes
+
+### Opening an unsigned app (first time)
+The macOS build is **not code-signed** (no paid Apple Developer account), so Gatekeeper
+will block it the first time. To open it:
+
+1. In Finder, **right-click** (or Control-click) **Jacky Never Type.app** → **Open**
+2. In the warning dialog, click **Open** again
+3. macOS remembers your choice — afterwards it launches normally
+
+> If you don't see an Open button, go to **System Settings → Privacy & Security**,
+> scroll down, and click **Open Anyway**.
 
 ### First launch — Accessibility permission
 On first run, macOS will show a dialog asking for **Accessibility** permission.

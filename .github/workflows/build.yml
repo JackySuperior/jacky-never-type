@@ -1,0 +1,60 @@
+name: Build
+
+on:
+  push:
+    tags: ['v*']        # 推送 v* tag（例如 v1.1）時自動打包並附到 Release
+  workflow_dispatch:    # 也可在 Actions 分頁手動觸發（產生可下載 artifact）
+
+permissions:
+  contents: write       # 附檔到 Release 需要寫入權限
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate macOS icon
+        if: matrix.platform == 'mac'
+        run: node scripts/make-icons.js
+
+      - name: Package
+        run: npm run package
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false   # 不簽章（個人散布用）
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-build
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.exe
+          if-no-files-found: ignore
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.dmg
+            release/*.zip
+            release/*.exe
