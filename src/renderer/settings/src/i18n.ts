@@ -96,7 +96,7 @@ export const translations = {
   // 關於分頁
   about_title:   { 'zh-Hant': '關於 Jacky Never Type', en: 'About Jacky Never Type' },
   about_desc:    { 'zh-Hant': 'AI 語音輸入工具', en: 'AI Voice Dictation Tool' },
-  about_version: { 'zh-Hant': '版本 1.2.0', en: 'Version 1.2.0' },
+  about_version: { 'zh-Hant': '版本 1.3.0', en: 'Version 1.3.0' },
   about_stt:     { 'zh-Hant': '支援的 STT 供應商：', en: 'Supported STT providers:' },
   about_ai:      { 'zh-Hant': '支援的 AI 修飾供應商：', en: 'Supported AI refinement providers:' },
   about_groq_stt:{ 'zh-Hant': 'Groq Whisper Large V3 Turbo（速度最快）', en: 'Groq Whisper Large V3 Turbo (fastest)' },

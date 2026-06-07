@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <!-- 麥克風存取（語音錄製必要） -->
+    <key>com.apple.security.device.audio-input</key><true/>
     <!-- 允許執行 AppleScript（貼字功能需要） -->
     <key>com.apple.security.automation.apple-events</key><true/>
     <!-- Electron 必要的 JIT 執行權限 -->

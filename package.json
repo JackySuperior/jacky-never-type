@@ -1,6 +1,6 @@
 {
   "name": "jacky-never-type",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "AI 語音輸入工具",
   "main": "dist/main/index.js",
   "scripts": {
@@ -39,7 +39,10 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "resources/entitlements.mac.plist",
-      "entitlementsInherit": "resources/entitlements.mac.plist"
+      "entitlementsInherit": "resources/entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Jacky Never Type needs microphone access to record your voice for speech-to-text transcription."
+      }
     },
     "win": {
       "target": [
