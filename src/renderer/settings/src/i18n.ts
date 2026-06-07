@@ -12,6 +12,7 @@ export const translations = {
   tab_stt:     { 'zh-Hant': '語音辨識',  en: 'Speech-to-Text' },
   tab_ai:      { 'zh-Hant': 'AI 修飾',   en: 'AI Refinement' },
   tab_output:  { 'zh-Hant': '輸出語言',  en: 'Output Language' },
+  tab_vocab:   { 'zh-Hant': '詞彙表',    en: 'Vocabulary' },
   tab_hotkey:  { 'zh-Hant': '快捷鍵',   en: 'Hotkey' },
   tab_history: { 'zh-Hant': '歷史',      en: 'History' },
   tab_about:   { 'zh-Hant': '關於',      en: 'About' },
@@ -48,6 +49,8 @@ export const translations = {
   ai_gemini:       { 'zh-Hant': '💎 Google Gemini 2.0 Flash（推薦）', en: '💎 Google Gemini 2.0 Flash (recommended)' },
   ai_openai:       { 'zh-Hant': '🤖 OpenAI GPT-4o Mini', en: '🤖 OpenAI GPT-4o Mini' },
   ai_groq:         { 'zh-Hant': '⚡ Groq LLaMA 3.3 70B', en: '⚡ Groq LLaMA 3.3 70B' },
+  smart_format:      { 'zh-Hant': '✨ 智慧排版（自動條列／分段）', en: '✨ Smart formatting (auto lists & paragraphs)' },
+  smart_format_hint: { 'zh-Hant': '列舉多個項目時自動變成清單，多主題時自動分段，效果類似 Typeless。', en: 'Turns enumerations into lists and splits topics into paragraphs, similar to Typeless.' },
 
   // 輸出語言分頁
   output_title:         { 'zh-Hant': '輸出語言', en: 'Output Language' },
@@ -60,10 +63,23 @@ export const translations = {
   output_target:        { 'zh-Hant': '目標語言', en: 'Target Language' },
   output_ai_warn:       { 'zh-Hant': '⚠️ 翻譯需要 AI，請先到「AI 修飾」分頁啟用。', en: '⚠️ Translation requires AI Refinement — please enable it first.' },
 
+  // 詞彙表分頁
+  vocab_title:        { 'zh-Hant': '自訂詞彙表 / AI 指示', en: 'Custom Vocabulary / AI Prompt' },
+  vocab_desc:         { 'zh-Hant': '幫助 AI 正確辨識人名、品牌、專業術語，並可加上你自己的修飾指示。需開啟「AI 修飾」才會生效。', en: 'Help the AI correctly recognise names, brands, and jargon, and add your own refinement instructions. Requires AI Refinement to be enabled.' },
+  vocab_list_label:   { 'zh-Hant': '常用詞彙（每行一個）', en: 'Custom terms (one per line)' },
+  vocab_list_ph:      { 'zh-Hant': '例如：\nJacky Never Type\n林志明\nKubernetes\nGroq', en: 'e.g.\nJacky Never Type\nLin Zhi-Ming\nKubernetes\nGroq' },
+  vocab_list_hint:    { 'zh-Hant': '辨識結果若出現發音相近的錯字，AI 會自動改成這裡的正確寫法。', en: 'If the result has misheard words, the AI will correct them to the spellings listed here.' },
+  vocab_prompt_label: { 'zh-Hant': '額外 AI 指示（選填）', en: 'Extra AI instruction (optional)' },
+  vocab_prompt_ph:    { 'zh-Hant': '例如：請使用條列式整理重點；語氣保持正式；保留英文專有名詞不要翻譯。', en: 'e.g. Summarise as bullet points; keep a formal tone; keep English proper nouns untranslated.' },
+  vocab_prompt_hint:  { 'zh-Hant': '這段指示會附加到 AI 修飾的提示詞，套用在每次輸出。', en: 'This instruction is appended to the AI refinement prompt for every output.' },
+  vocab_ai_warn:      { 'zh-Hant': '⚠️ 詞彙表與指示需要 AI，請先到「AI 修飾」分頁啟用。', en: '⚠️ Vocabulary and instructions require AI — please enable it in the AI Refinement tab first.' },
+
   // 快捷鍵分頁
   hotkey_title:   { 'zh-Hant': '快捷鍵設定', en: 'Hotkey Settings' },
   hotkey_label:   { 'zh-Hant': '錄音熱鍵（單按開始/停止）', en: 'Recording hotkey (press once to start/stop)' },
   hotkey_hint:    { 'zh-Hant': '格式：CommandOrControl / Alt / Shift + 按鍵\n例如：CommandOrControl+Shift+Space', en: 'Format: CommandOrControl / Alt / Shift + Key\nExample: CommandOrControl+Shift+Space' },
+  showlast_label: { 'zh-Hant': '叫出上一句熱鍵（顯示複製卡片）', en: 'Show last result hotkey (copy card)' },
+  showlast_hint:  { 'zh-Hant': '若剛剛說的話沒貼進想要的地方，按這個鍵可叫出上一句的文字並一鍵複製。', en: 'If the last dictation did not land where you wanted, press this to bring up the text and copy it.' },
   port_label:     { 'zh-Hant': '設定頁面連接埠', en: 'Settings server port' },
 
   // 歷史分頁
@@ -78,7 +94,7 @@ export const translations = {
   // 關於分頁
   about_title:   { 'zh-Hant': '關於 Jacky Never Type', en: 'About Jacky Never Type' },
   about_desc:    { 'zh-Hant': 'AI 語音輸入工具', en: 'AI Voice Dictation Tool' },
-  about_version: { 'zh-Hant': '版本 1.0.0', en: 'Version 1.0.0' },
+  about_version: { 'zh-Hant': '版本 1.1.0', en: 'Version 1.1.0' },
   about_stt:     { 'zh-Hant': '支援的 STT 供應商：', en: 'Supported STT providers:' },
   about_ai:      { 'zh-Hant': '支援的 AI 修飾供應商：', en: 'Supported AI refinement providers:' },
   about_groq_stt:{ 'zh-Hant': 'Groq Whisper Large V3 Turbo（速度最快）', en: 'Groq Whisper Large V3 Turbo (fastest)' },

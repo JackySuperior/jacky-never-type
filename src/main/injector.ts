@@ -1,6 +1,10 @@
 import { clipboard, systemPreferences, dialog, shell } from 'electron';
 import { execSync } from 'child_process';
 
+/**
+ * 把文字貼到目前焦點處（一律自動貼上）。
+ * 找不到落點時的補救：使用者可按第二個熱鍵叫出「上一句」的複製卡片。
+ */
 export async function injectText(text: string): Promise<void> {
   const previousClipboard = clipboard.readText();
 

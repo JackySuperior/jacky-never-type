@@ -10,11 +10,11 @@ export function createTray(): Tray {
   if (icon.isEmpty()) icon = nativeImage.createEmpty();
 
   tray = new Tray(icon);
-  tray.setToolTip('Jacky Never Type — AI 語音輸入（右鍵開選單）');
+  tray.setToolTip('Jacky Never Type — AI Voice Input（雙擊開設定 / double-click for settings）');
 
-  // Windows 左鍵點擊也顯示選單
-  tray.on('click', () => {
-    tray?.popUpContextMenu();
+  // 左鍵雙擊：直接開啟設定頁
+  tray.on('double-click', () => {
+    openSettingsServer();
   });
 
   updateTrayMenu();
@@ -22,27 +22,17 @@ export function createTray(): Tray {
   return tray;
 }
 
-export function updateTrayMenu(isRecording = false) {
+export function updateTrayMenu(_isRecording = false) {
   if (!tray) return;
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: isRecording ? '⏹ 停止錄音' : '🎙 開始錄音',
-      click: () => {
-        // 觸發熱鍵邏輯（透過 overlay window）
-        const { getOverlayWindow } = require('./index');
-        const win = getOverlayWindow();
-        win?.webContents.send('toggle-from-tray');
-      },
-    },
-    { type: 'separator' },
-    {
-      label: '⚙️ 設定',
+      label: '⚙️ 設定 / Settings',
       click: () => openSettingsServer(),
     },
     { type: 'separator' },
     {
-      label: '離開',
+      label: '🚪 離開 / Exit',
       click: () => app.quit(),
     },
   ]);

@@ -97,7 +97,8 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 160px;
+  width: 190px;
+  flex-shrink: 0;
   padding: 16px 12px;
   border-right: 1px solid var(--border);
   display: flex;
@@ -119,6 +120,7 @@ body {
   text-align: left;
   transition: all 0.15s;
   width: 100%;
+  white-space: nowrap;
 }
 
 .nav-item:hover {
@@ -182,6 +184,26 @@ select {
 }
 
 input:focus, select:focus {
+  border-color: var(--accent);
+}
+
+/* 詞彙表 textarea */
+.vocab-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.vocab-textarea:focus {
   border-color: var(--accent);
 }
 

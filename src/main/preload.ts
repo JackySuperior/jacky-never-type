@@ -17,6 +17,13 @@ contextBridge.exposeInMainWorld('jnt', {
     ipcRenderer.on('toggle-from-tray', () => cb());
   },
 
+  // 結果彈窗（找不到貼上位置時）
+  onShowResult: (cb: (data: { text: string }) => void) => {
+    ipcRenderer.on(IPC.SHOW_RESULT, (_event, data) => cb(data));
+  },
+  copyResult: (text: string) => ipcRenderer.send(IPC.COPY_RESULT, text),
+  closeResult: () => ipcRenderer.send(IPC.CLOSE_RESULT),
+
   // 設定
   getSettings: () => ipcRenderer.invoke(IPC.GET_SETTINGS),
   saveSettings: (settings: unknown) => ipcRenderer.send(IPC.SAVE_SETTINGS, settings),

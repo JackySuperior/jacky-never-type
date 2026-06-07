@@ -1,6 +1,6 @@
 {
   "name": "jacky-never-type",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI 語音輸入工具",
   "main": "dist/main/index.js",
   "scripts": {
@@ -28,8 +28,13 @@
       "category": "public.app-category.productivity",
       "icon": "resources/app-icon.icns",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
       ],
       "hardenedRuntime": true,
       "gatekeeperAssess": false,

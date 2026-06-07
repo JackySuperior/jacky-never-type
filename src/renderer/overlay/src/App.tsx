@@ -10,6 +10,9 @@ declare global {
       onRecordingState: (cb: (data: { state: string; message?: string }) => void) => void;
       onStopRecording: (cb: () => void) => void;
       onToggleFromTray: (cb: () => void) => void;
+      onShowResult: (cb: (data: { text: string }) => void) => void;
+      copyResult: (text: string) => void;
+      closeResult: () => void;
       toggleRecording: () => void;
     };
   }
@@ -19,6 +22,8 @@ export default function App() {
   const [state, setState] = useState<State>('idle');
   const [message, setMessage] = useState('');
   const [duration, setDuration] = useState(0);
+  const [result, setResult] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -28,6 +33,8 @@ export default function App() {
     window.jnt.onRecordingState(({ state: newState, message: msg }) => {
       setState(newState as State);
       setMessage(msg ?? '');
+      // 新一輪錄音／處理時，清掉舊的結果彈窗
+      if (newState === 'recording' || newState === 'processing') setResult(null);
 
       if (newState === 'recording') {
         startLocalRecording();
@@ -45,7 +52,26 @@ export default function App() {
     window.jnt.onToggleFromTray(() => {
       window.jnt.toggleRecording();
     });
+
+    // 找不到貼上位置 → 顯示結果彈窗
+    window.jnt.onShowResult(({ text }) => {
+      setState('idle');
+      setResult(text);
+      setCopied(false);
+    });
   }, []);
+
+  function handleCopy() {
+    if (result == null) return;
+    window.jnt.copyResult(result);
+    setCopied(true);
+  }
+
+  function handleClose() {
+    setResult(null);
+    setCopied(false);
+    window.jnt.closeResult();
+  }
 
   function startLocalRecording() {
     // 避免重複啟動：若已有錄音或計時器在跑，先忽略
@@ -103,6 +129,24 @@ export default function App() {
     const m = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  // 結果彈窗（找不到貼上位置時）
+  if (result != null) {
+    return (
+      <div className="result-card">
+        <div className="result-header">
+          <span className="result-title">📝 Last dictation — click Copy</span>
+          <button className="result-close" onClick={handleClose}>✕</button>
+        </div>
+        <div className="result-text">{result}</div>
+        <div className="result-actions">
+          <button className={`result-copy ${copied ? 'copied' : ''}`} onClick={handleCopy}>
+            {copied ? '✅ Copied!' : '📋 Copy'}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (state === 'idle') return null;

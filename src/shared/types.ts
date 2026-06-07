@@ -31,6 +31,13 @@ export interface AppSettings {
   aiProvider: AIProvider;
   aiStrength: 'light' | 'standard' | 'strong';
 
+  // 自訂詞彙表（人名／專業術語，每行一個）與額外 AI 指示
+  customVocabulary: string;
+  customPrompt: string;
+
+  // 智慧排版（自動條列／分段，仿 Typeless）
+  smartFormatting: boolean;
+
   // 輸出語言設定
   outputMode: OutputMode;      // 'original' 維持原文 / 'fixed' 永遠輸出指定語言
   outputLanguage: string;      // fixed 模式時的目標語言代碼
@@ -39,7 +46,8 @@ export interface AppSettings {
   uiLanguage: UILanguage;
 
   // 熱鍵
-  hotkey: string; // e.g. 'CommandOrControl+Shift+Space'
+  hotkey: string; // 錄音開始/停止，e.g. 'F9'
+  showLastHotkey: string; // 叫出上一句的複製卡片，e.g. 'F10'
 
   // 其他
   settingsPort: number;
@@ -55,10 +63,14 @@ export const DEFAULT_SETTINGS: AppSettings = {
   aiEnabled: true,
   aiProvider: 'groq',
   aiStrength: 'standard',
+  customVocabulary: '',
+  customPrompt: '',
+  smartFormatting: true,
   outputMode: 'original',
   outputLanguage: 'zh-Hant',
   uiLanguage: 'zh-Hant',
   hotkey: 'F9',
+  showLastHotkey: 'F10',
   settingsPort: 51789,
   startOnLogin: false,
 };
@@ -74,6 +86,11 @@ export const IPC = {
   GET_SETTINGS: 'get-settings',
   SAVE_SETTINGS: 'save-settings',
   OPEN_SETTINGS: 'open-settings',
+
+  // 結果彈窗（找不到貼上位置時）
+  SHOW_RESULT: 'show-result',
+  COPY_RESULT: 'copy-result',
+  CLOSE_RESULT: 'close-result',
 
   // 狀態通知
   STATUS_UPDATE: 'status-update',

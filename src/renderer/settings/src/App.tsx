@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AppSettings, DEFAULT_SETTINGS, STTProvider, AIProvider, HistoryEntry, OUTPUT_LANGUAGES } from '../../../shared/types';
 import { t } from './i18n';
 
-type Tab = 'api' | 'stt' | 'ai' | 'output' | 'hotkey' | 'history' | 'about';
+type Tab = 'api' | 'stt' | 'ai' | 'output' | 'vocab' | 'hotkey' | 'history' | 'about';
 
 export default function App() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -109,7 +109,7 @@ export default function App() {
 
       <div className="layout">
         <nav className="sidebar">
-          {(['api', 'stt', 'ai', 'output', 'hotkey', 'history', 'about'] as Tab[]).map(tab => (
+          {(['api', 'stt', 'ai', 'output', 'vocab', 'hotkey', 'history', 'about'] as Tab[]).map(tab => (
             <button
               key={tab}
               className={`nav-item ${activeTab === tab ? 'active' : ''}`}
@@ -258,6 +258,18 @@ export default function App() {
                       </label>
                     </div>
                   </div>
+
+                  <div className="form-group">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.smartFormatting}
+                        onChange={e => update('smartFormatting', e.target.checked)}
+                      />
+                      <span>{t('smart_format', lang)}</span>
+                    </label>
+                    <span className="hint">{t('smart_format_hint', lang)}</span>
+                  </div>
                 </>
               )}
             </section>
@@ -320,6 +332,43 @@ export default function App() {
             </section>
           )}
 
+          {activeTab === 'vocab' && (
+            <section>
+              <h2>{t('vocab_title', lang)}</h2>
+              <p className="desc">{t('vocab_desc', lang)}</p>
+
+              {!settings.aiEnabled && (
+                <p className="hint" style={{ color: '#ff9f43', marginBottom: 20 }}>
+                  {t('vocab_ai_warn', lang)}
+                </p>
+              )}
+
+              <div className="form-group">
+                <label>{t('vocab_list_label', lang)}</label>
+                <textarea
+                  className="vocab-textarea"
+                  value={settings.customVocabulary}
+                  onChange={e => update('customVocabulary', e.target.value)}
+                  placeholder={t('vocab_list_ph', lang)}
+                  rows={6}
+                />
+                <span className="hint">{t('vocab_list_hint', lang)}</span>
+              </div>
+
+              <div className="form-group">
+                <label>{t('vocab_prompt_label', lang)}</label>
+                <textarea
+                  className="vocab-textarea"
+                  value={settings.customPrompt}
+                  onChange={e => update('customPrompt', e.target.value)}
+                  placeholder={t('vocab_prompt_ph', lang)}
+                  rows={3}
+                />
+                <span className="hint">{t('vocab_prompt_hint', lang)}</span>
+              </div>
+            </section>
+          )}
+
           {activeTab === 'hotkey' && (
             <section>
               <h2>{t('hotkey_title', lang)}</h2>
@@ -335,6 +384,17 @@ export default function App() {
                 <span className="hint" style={{ whiteSpace: 'pre-line' }}>
                   {t('hotkey_hint', lang)}
                 </span>
+              </div>
+
+              <div className="form-group">
+                <label>{t('showlast_label', lang)}</label>
+                <input
+                  type="text"
+                  value={settings.showLastHotkey}
+                  onChange={e => update('showLastHotkey', e.target.value)}
+                  placeholder="F10"
+                />
+                <span className="hint">{t('showlast_hint', lang)}</span>
               </div>
 
               <div className="form-group">
@@ -422,5 +482,5 @@ export default function App() {
 }
 
 function tabIcon(tab: Tab): string {
-  return { api: '🔑', stt: '🎙', ai: '✨', output: '🌐', hotkey: '⌨️', history: '📜', about: 'ℹ️' }[tab];
+  return { api: '🔑', stt: '🎙', ai: '✨', output: '🌐', vocab: '📖', hotkey: '⌨️', history: '📜', about: 'ℹ️' }[tab];
 }

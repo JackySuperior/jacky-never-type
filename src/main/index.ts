@@ -1,7 +1,7 @@
 import { app, BrowserWindow, globalShortcut, ipcMain, screen } from 'electron';
 import * as path from 'path';
 import { createTray, updateTrayMenu } from './tray';
-import { setupRecorderIPC, setOverlayWindow, setRecordingState, getCurrentState } from './recorder';
+import { setupRecorderIPC, setOverlayWindow, setRecordingState, getCurrentState, showLastResult } from './recorder';
 import { getSettings, saveSettings } from './store';
 import { openSettingsServer, stopSettingsServer } from './settings-server';
 import { checkMacAccessibility } from './injector';
@@ -88,6 +88,9 @@ async function main() {
 
   // 監聽 overlay 的切換請求
   ipcMain.on(IPC.TOGGLE_RECORDING, () => handleToggleRecording());
+
+  // 啟動後直接顯示設定頁（關掉設定即縮回系統匣）
+  openSettingsServer();
 }
 
 function registerHotkey() {
@@ -104,6 +107,15 @@ function registerHotkey() {
     console.error(`[Hotkey] 無法註冊熱鍵: ${hotkey}`);
   } else {
     console.log(`[Hotkey] 已註冊: ${hotkey}`);
+  }
+
+  // 第二個熱鍵：叫出上一句的複製卡片
+  if (settings.showLastHotkey && settings.showLastHotkey !== hotkey) {
+    const ok = globalShortcut.register(settings.showLastHotkey, () => {
+      showLastResult();
+    });
+    if (!ok) console.error(`[Hotkey] 無法註冊熱鍵: ${settings.showLastHotkey}`);
+    else console.log(`[Hotkey] 已註冊(叫出上一句): ${settings.showLastHotkey}`);
   }
 }
 
@@ -134,4 +146,13 @@ app.on('window-all-closed', () => {
   // 保持在系統匣，不關閉 app
 });
 
-main();
+// 單一執行個體：再次點擊桌面 icon 時，不開新視窗，改成叫出設定頁
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    openSettingsServer();
+  });
+  main();
+}

@@ -73,3 +73,89 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* 結果彈窗（找不到貼上位置時） */
+.result-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(24, 24, 32, 0.95);
+  border: 1px solid rgba(150, 150, 200, 0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  height: calc(100vh - 24px);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.result-title {
+  color: #b9b9d0;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-close {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ddd;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.result-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.result-text {
+  flex: 1;
+  overflow-y: auto;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.result-copy {
+  padding: 7px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #6c63ff;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.result-copy:hover {
+  background: #8880ff;
+}
+
+.result-copy.copied {
+  background: #22c55e;
+}

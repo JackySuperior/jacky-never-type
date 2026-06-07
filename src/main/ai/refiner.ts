@@ -33,6 +33,33 @@ const PROMPTS = {
 只輸出修飾後的文字，不加任何解釋。`,
 };
 
+// 依設定產生「專有名詞校正 + 額外指示」規則
+function buildVocabularyRule(settings: AppSettings): string {
+  let rule = '';
+  if (settings.customVocabulary && settings.customVocabulary.trim()) {
+    rule += `
+【專有名詞校正】以下是使用者常用的人名／專業術語的正確寫法。若辨識結果出現發音相近的錯字，請務必改成下列正確寫法：
+${settings.customVocabulary.trim()}`;
+  }
+  if (settings.customPrompt && settings.customPrompt.trim()) {
+    rule += `
+【額外指示】${settings.customPrompt.trim()}`;
+  }
+  return rule;
+}
+
+// 依設定產生「智慧排版」規則（自動條列／分段）
+function buildFormattingRule(settings: AppSettings): string {
+  if (!settings.smartFormatting) return '';
+  return `
+【智慧排版】請依語意自動排版，讓結果易讀：
+- 若內容在列舉三個以上的並列項目，請用條列呈現（每項一行，前面加「- 」）
+- 若是先後步驟或有順序的流程，用「1. 2. 3.」編號
+- 若內容包含多個主題或段落，不同主題之間用空行分段
+- 若只是單一短句或簡短內容，維持原樣，不要硬分段
+- 不要新增原文沒有的內容，也不要刪減重要資訊`;
+}
+
 // 依設定產生「輸出語言」規則
 function buildLanguageRule(settings: AppSettings): string {
   if (settings.outputMode === 'fixed') {
@@ -52,7 +79,10 @@ export async function refineText(
 ): Promise<string> {
   if (!settings.aiEnabled || !rawText.trim()) return rawText;
 
-  const prompt = PROMPTS[settings.aiStrength] + buildLanguageRule(settings);
+  const prompt = PROMPTS[settings.aiStrength]
+    + buildVocabularyRule(settings)
+    + buildFormattingRule(settings)
+    + buildLanguageRule(settings);
   const userMessage = `請修飾以下文字：\n\n${rawText}`;
 
   try {
