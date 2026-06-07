@@ -1,5 +1,7 @@
-import { clipboard, systemPreferences, dialog, shell } from 'electron';
+import { clipboard, systemPreferences, dialog, shell, app } from 'electron';
 import { execSync } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * 把文字貼到目前焦點處（一律自動貼上）。
@@ -39,9 +41,43 @@ function simulatePasteWindows(): void {
 
 function simulatePasteMac(): void {
   // 使用 AppleScript 模擬 Cmd+V
-  execSync(`osascript -e 'tell application "System Events" to keystroke "v" using command down'`, {
-    timeout: 2000,
-  });
+  try {
+    execSync(`osascript -e 'tell application "System Events" to keystroke "v" using command down'`, {
+      timeout: 2000,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    // 寫入 debug log
+    try {
+      const logPath = path.join(app.getPath('userData'), 'jnt-debug.log');
+      fs.appendFileSync(logPath, `[${new Date().toISOString()}] Mac 貼字失敗: ${msg}\n`);
+    } catch { /* ignore */ }
+
+    // 錯誤碼 1743 或 "not allowed" = Automation 權限被拒
+    const isAutomationDenied = msg.includes('1743') || msg.toLowerCase().includes('not allowed')
+      || msg.toLowerCase().includes('assistive') || msg.toLowerCase().includes('automation');
+
+    if (isAutomationDenied) {
+      dialog.showMessageBox({
+        type: 'warning',
+        title: 'Automation Permission Required',
+        message: 'Jacky Never Type cannot paste text — Automation permission is denied.',
+        detail:
+          'Please go to:\n' +
+          'System Settings → Privacy & Security → Automation\n\n' +
+          'Then enable "System Events" under "Jacky Never Type".\n\n' +
+          'Also ensure "Accessibility" is enabled in the same Privacy & Security section.',
+        buttons: ['Open System Settings', 'OK'],
+        defaultId: 0,
+      }).then(({ response }) => {
+        if (response === 0) {
+          shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Automation');
+        }
+      });
+    }
+
+    throw err; // 讓上層 catch 繼續處理
+  }
 }
 
 function sleep(ms: number): Promise<void> {
@@ -62,7 +98,12 @@ export function checkMacAccessibility(): void {
       type: 'warning',
       title: 'Accessibility Permission Required',
       message: 'Jacky Never Type needs Accessibility access to paste text into other apps.',
-      detail: 'Open System Settings → Privacy & Security → Accessibility, then enable "Jacky Never Type".',
+      detail:
+        'Step 1: Open System Settings → Privacy & Security → Accessibility\n' +
+        'Enable "Jacky Never Type".\n\n' +
+        'Step 2: Also check Privacy & Security → Automation\n' +
+        'Enable "System Events" under "Jacky Never Type".\n\n' +
+        'Restart the app after granting both permissions.',
       buttons: ['Open System Settings', 'Later'],
       defaultId: 0,
     }).then(({ response }) => {
